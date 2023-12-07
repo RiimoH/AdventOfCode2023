@@ -104,52 +104,24 @@ def make_actions(inp):
 
 def make_maps(actions):
     maps: List[Subaction] = [Subaction(0, math.inf, 0)]
-    for action in actions:
-        nmaps = list()
-        old = maps.pop(0)
-        new = action.pop(0)
+    for action in actions:        
+        nmaps = []
+        lower_bounds = list(sorted(set([x[0] for x in maps] + [x[0] for x in action])))
 
-        while True:
-            if old.upper_boundary + old.calculation < new.lower_boundary:
-                nmaps.append(old)
-                old = maps.pop(0)
+        subaction = action.pop(0)
+        srange = maps.pop(0)
 
-            elif (
-                old.upper_boundary + old.calculation
-                < new.upper_boundary & old.lower_boundary + old.calculation
-                < new.lower_boundary
-            ):
-                nmaps.append(
-                    Subaction(
-                        old.lower_boundary,
-                        new.lower_boundary - old.lower_boundary + old.calculation,
-                        old.calculation,
-                    )
-                )
-                old = Subaction(
-                    new.lower_boundary - old.lower_boundary + old.calculation + 1,
-                    old.upper_boundary,
-                    old.calculation + new.calculation,
-                )
-            elif (
-                old.upper_boundary + old.calculation
-                > new.upper_boundary & old.lower_boundary + old.calculation
-                < new.lower_boundary
-            ):
-                nmaps.append(
-                    Subaction(
-                        old.lower_boundary,
-                        new.lower_boundary - old.lower_boundary + old.calculation,
-                        old.calculation,
-                    )
-                )
-                old = Subaction(
-                    new.lower_boundary - old.lower_boundary + old.calculation + 1,
-                    old.upper_boundary,
-                    old.calculation + new.calculation,
-                )
+        for lb in lower_bounds:
+            if lb > subaction[0]:
+                subaction = subaction.pop(0)
+            if lb > srange[0]:
+                srange = maps.pop(0)
 
-        maps = nmaps
+            
+
+
+
+        ic(lower_bounds)
 
     return maps
 
@@ -162,7 +134,7 @@ def part_two(inp):
 
     actions = make_actions(inp)
 
-    # maps = make_maps(actions)
+    maps = make_maps(actions)
 
     return
 
