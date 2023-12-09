@@ -77,68 +77,57 @@ def part_one(inp):
     return min([v[7] for v in seeds.values()])
 
 
-Subaction = namedtuple("Subaction", ["lower_boundary", "upper_boundary", "calculation"])
+Subaction = namedtuple(
+    "Subaction",
+    ["target_lower", "target_upper", "origin_lower", "origin_upper", "calculation"],
+)
+
+Map = namedtuple(
+    "Map", ["lower_bounds", "upper_bounds", "origin"]
+)
 
 
 def make_actions(inp):
     actions: List[Subaction] = []
 
-    for action in inp[1:]:
+    for action in inp:
         action = action[1:]
         subaction: List[Subaction] = list()
         for srange in action:
             srange = list(map(int, srange.split()))
-            sa = Subaction(srange[1], srange[1] + srange[2] - 1, srange[0] - srange[1])
+            sa = Subaction(
+                srange[0],
+                srange[0] + srange[2] - 1,
+                srange[1],
+                srange[1] + srange[2] - 1,
+                srange[0] - srange[1],
+            )
             subaction.append(sa)
         subaction.sort()
 
-        if subaction[0][0] > 0:
-            subaction.insert(0, Subaction(0, subaction[0][0] - 1, 0))
-
         actions.append(subaction)
-
-    ic(actions)
 
     return actions
 
 
-def make_maps(actions):
-    maps: List[Subaction] = [Subaction(0, math.inf, 0)]
-    for action in actions:        
-        nmaps = []
-        lower_bounds = list(sorted(set([x[0] for x in maps] + [x[0] for x in action])))
-
-        subaction = action.pop(0)
-        srange = maps.pop(0)
-
-        for lb in lower_bounds:
-            if lb > subaction[0]:
-                subaction = subaction.pop(0)
-            if lb > srange[0]:
-                srange = maps.pop(0)
-
-            
-
-
-
-        ic(lower_bounds)
-
-    return maps
-
-
 def part_two(inp):
     inp = inp.split("\n\n")
+    seed, inp = inp[0], inp[1:]
     inp = list(map(lambda x: x.split("\n"), inp))
-
-    min_location = math.inf
 
     actions = make_actions(inp)
 
-    maps = make_maps(actions)
+    raw_seeds = list(map(int, seed.split()[1:]))
+    seeds = []
+    while raw_seeds:
+        start = raw_seeds.pop(0)
+        srange = raw_seeds.pop(1)
 
+        seeds.append(Map(start, start+srange-1, start))
+
+    ic(actions)
+    ic(seeds)
     return
-
-    seeds = list(map(int, inp[0][0].split()[1:]))
 
     while seeds:
         sstart, srange, seeds = seeds[0], seeds[1], seeds[2:]

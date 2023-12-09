@@ -4,7 +4,7 @@ from icecream import ic
 test = """"""
 
 
-def parse(line):
+def parse(inp):
     ...
 
 
@@ -16,10 +16,10 @@ def part_two(inp):
     ...
 
 
-print("Test One:", part_one(test))
+# with open("") as fp:
+#     inp = fp.read()
 
-with open("") as fp:
-    inp = fp.read()
+print("Test One:", part_one(test))
 
 # print("Part One:", part_one(inp))
 
