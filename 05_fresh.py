@@ -43,7 +43,7 @@ def parse_maps(maps):
     for map in maps:
         _, *ranges = map.split("\n")
         ranges = [
-            [int(x) for x in r.split()] for r in ranges
+            [(x) for x in r.split()] for r in ranges
         ]        
         all_maps.append(ranges)
     
@@ -68,8 +68,10 @@ def part_two(inp):
     ic(seeds)
 
     for map in maps:
+        new_seeds = list()
         for action in map:
             for seed in seeds:
+                if seed 
                 if action[1] in seed:
                     ...
 
