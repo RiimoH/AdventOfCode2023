@@ -169,8 +169,12 @@ def part_two(inp):
         turn = get_turn(vector, new_vector)
 
         if turn == 0:
-            left.add((new_part[0] - new_vector[1], new_part[1] + new_vector[0]))
-            right.add((new_part[0] + new_vector[1], new_part[1] - new_vector[0]))
+            l = (new_part[0] - new_vector[1], new_part[1] + new_vector[0])
+            if l not in whole_chain:
+                left.add(l)
+            r = (new_part[0] + new_vector[1], new_part[1] - new_vector[0])
+            if r not in whole_chain:
+                right.add(r)
         else:
             left_right += turn
             vector = new_vector
