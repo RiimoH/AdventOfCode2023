@@ -101,10 +101,10 @@ def part_two(inp, jump: int):
                 distance = abs(gb[0] - ga[0]) + abs(gb[1] - ga[1])
                 for x in row_jumps:
                     if min(ga[0], gb[0]) < x < max(ga[0], gb[0]):
-                        distance += jump-1
+                        distance += jump - 1
                 for y in col_jumps:
                     if min(ga[1], gb[1]) < y < max(ga[1], gb[1]):
-                        distance += jump-1
+                        distance += jump - 1
 
                 shortest_distances.append(distance)
 
