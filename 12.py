@@ -1,5 +1,7 @@
 from icecream import ic
 import re
+from functools import lru_cache
+from typing import List
 
 re_replace = r"\.+"
 
@@ -21,36 +23,51 @@ def parse(inp):
 
     return rows
 
+@lru_cache
+def brute(row: str, nums: List[int]):
+    if len(nums) == 0:
+        return 1
 
-def find_combinations(row, nums):
-    if len(nums) == 1:
-        if nums[0] > len(row):
-            return 0
-        else:
-            return len(row) - nums[0] + 1
+    s = 0
 
-    if sum(nums) + len(nums) - 1 > len(row):  # there are not enough spaces to process
-        return 0
+    s += brute('.'+row[1:], nums)
+    num = nums[0]
+    if row.startswith('#'*num) and row[num] != '#':
+        s += brute(row[num+2:].lstrip('.'), nums[1:])
 
-    factors = []
+    return s
 
-    max_int = max(nums)
-    if nums.count(max_int) == 1:
-        row_lens = [len(x) for x in row]
-        if row_lens.count(max_int) == 1:
-            factors.append(
-                find_combinations(
-                    row[: row_lens.index(max_int)], nums[: nums.index(max_int)]
-                )
-            )
-            factors.append(
-                scd=find_combinations(
-                    row[row_lens.index(max_int) + 1], nums[nums.index(max_int) + 1 :]
-                )
-            )
+# @lru_cache
+# def find_combinations(rows, nums):
+#     if len(nums) == 1 or len(rows) == 1:
 
-    for idx in range(len(row)):
-        find_combinations(row[idx + len(nums[0]) :], nums[1:])
+#         if nums[0] > max(map(len, rows)):
+#             return 0
+#         else:
+#             return sum(len(row) - nums[0] + 1 for row in rows)
+
+#     if sum(nums) + len(nums) - 1 > len(rows):  # there are not enough spaces to process
+#         return 0
+
+#     factors = []
+
+#     max_int = max(nums)
+#     if nums.count(max_int) == 1:
+#         row_lens = [len(x) for x in rows]
+#         if row_lens.count(max_int) == 1:
+#             factors.append(
+#                 find_combinations(
+#                     rows[: row_lens.index(max_int)], nums[: nums.index(max_int)]
+#                 )
+#             )
+#             factors.append(
+#                 scd=find_combinations(
+#                     rows[row_lens.index(max_int) + 1], nums[nums.index(max_int) + 1 :]
+#                 )
+#             )
+
+#     for idx in range(len(rows)):
+#         find_combinations(rows[idx + len(nums[0]) :], nums[1:])
 
 
 def part_one(inp):
