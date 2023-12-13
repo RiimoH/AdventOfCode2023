@@ -113,57 +113,6 @@ def part_two(inp):
     return ts
 
 
-# def part_two(inp):
-#     def parse(inp):
-#         inp = inp.split("\n\n")
-#         output = []
-#         for mirror in inp:
-#             mirror = [
-#                 int(x, 2)
-#                 for x in mirror.replace("#", "1").replace(".", "0").split("\n")
-#             ]
-
-#             output.append(mirror)
-#         return output
-
-#     def find_horizontal_reflection(inp):
-#         for i in range(len(inp) - 1):
-#             pairs = []
-#             for d in range(min(i + 1, len(inp) - i - 1)):
-            
-#                 x, y = inp[i - d], inp[i + 1 + d]
-#                 comp = x ^ y
-#                 count = bin(comp).count('1')
-#                 ic(x, y, comp, count)
-#                 pairs.append(count)
-#                 if count > 1:
-#                     break
-
-#             if sum(pairs) == 1:
-#                 return i + 1
-
-#         return -1
-
-#     def find_vertical_reflection(inp):
-#         inp = [format(x, '09b') for x in inp]
-#         inp = [int("".join(x), 2) for x in list(zip(*inp))[2:]]
-#         return find_horizontal_reflection(inp)
-
-#     inp = parse(inp)
-
-#     ts = 0
-#     for part in inp:
-#         x = find_horizontal_reflection(part)
-#         if x >= 0:
-#             ts += x * 100
-#             continue
-#         x = find_vertical_reflection(part)
-#         if x >= 0:
-#             ts += x
-#             continue
-
-#     return ts
-
 
 with open("13.inp") as fp:
     inp = fp.read()
