@@ -117,9 +117,9 @@ def part_two(inp):
 with open("13.inp") as fp:
     inp = fp.read()
 
-# print("Test One:", part_one(test))
+print("Test One:", part_one(test))
 
-# print("Part One:", part_one(inp))
+print("Part One:", part_one(inp))
 
 print("Test Two:", part_two(test))
 
