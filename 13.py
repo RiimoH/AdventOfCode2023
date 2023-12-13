@@ -174,4 +174,4 @@ with open("13.inp") as fp:
 
 print("Test Two:", part_two(test))
 
-print("Part Two:", part_two(inp), "> 36150")
+print("Part Two:", part_two(inp))
