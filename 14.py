@@ -24,88 +24,52 @@ O..#.OO...
 
 
 def parse(inp):
-    rows = inp.split("\n")
-    rows = ["#" * len(rows[0])] + rows
+    rows = inp.splitlines()
     return rows
 
 
-def part_one(rows):
-    total = 0
-    for r, row in enumerate(rows):
-        for c, tile in enumerate(row):
-            if tile == "#":
-                # shift all the rocks closer
-                next_spot = r + 1
-
-                for dr in range(r + 1, len(rows)):
-                    if rows[dr][c] == "O":
-                        total += len(rows) - next_spot
-                        next_spot += 1
-                    if rows[dr][c] == "#":
-                        break
-
-    return total
-
-
-def rotate_matrix(m):
-    nm = [list(reversed(col)) for col in zip(*m)]
-    if "." in nm[0] or "O" in nm[0]:
-        nm = ["#" * len(nm[0])] + nm
+def rotate_cw(m):
+    # Rotates clockwise
+    nm = tuple("".join(reversed(col)) for col in zip(*m))
     return nm
 
 
-def move_all(rows):
-    new_rows = [[x if x == "#" else "." for x in row] for row in rows]
-    for r, row in enumerate(rows):
-        for c, tile in enumerate(row):
-            if tile == "#":
-                # shift all the rocks closer
-                next_spot = r + 1
+def roll(rows):
+    # Moves everything to the right.
+    rows = tuple("#".join("".join(sorted(r)) for r in row.split("#")) for row in rows)
+    return rows
 
-                for dr in range(r + 1, len(rows)):
-                    if rows[dr][c] == "O":
-                        new_rows[next_spot][c] = "O"
-                        next_spot += 1
-                    if rows[dr][c] == "#":
-                        break
-    return new_rows
+
+def calc(rows):
+    return sum(x for row in rows for x, char in enumerate(row, 1) if char == "O")
+
+
+def part_one(rows):
+    rows = parse(rows)
+    rows = rotate_cw(rows)
+    rows = roll(rows)
+    return calc(rows)
 
 
 def part_two(rows, cycles=3):
-    def calc(rows):
-        total = 0
-        for r, row in enumerate(rows):
-            print("".join(row), r)
-            for c, tile in enumerate(row):
-                if tile == "O":
-                    total += len(rows) - r
-        return total
-
-    memo = {}
-    for cycle in range(cycles):
-        for i in range(4):
-            rows = rotate_matrix(move_all(rows))
-
-        state = "\n".join(["".join(row[1:-1]) for row in rows[1:-1]])
-        if state in memo:
-            print(state)
-            return (cycle, memo[state], calc(rows))
-        else:
-            memo["\n".join(["".join(row) for row in rows])] = cycle
-
-        # print(f"\nAfter {cycle+1} cycles:")
-        # for row in rows:
-        #     print("".join(row))
-    return part_one(rows)
+    rows = parse(rows)
+    rows = rotate_cw(rows)
+    memo = dict()
+    for c in range(cycles):
+        if rows in memo:
+            i = memo[rows] + (cycles - c) % (c - memo[rows])
+            return calc(next(k for k, v in memo.items() if v == i))
+        memo[rows] = c
+        rows = rotate_cw(roll(rotate_cw(roll(rotate_cw(roll(rotate_cw(roll(rows))))))))
 
 
 with open("14.inp") as fp:
     inp = fp.read()
 
-print("Test One:", part_one(parse(test)))
+print("Test One:", part_one(test))
 
-print("Part One:", part_one(parse(inp)))
+print("Part One:", part_one(inp))
 
-print("Test Two:", part_two(parse(test), cycles=1_000_000_000))
+print("Test Two:", part_two(test, cycles=1000000000))
 
-# print("Test Two:", part_two(parse(inp)))
+print("Test Two:", part_two(inp, cycles=1_000_000_000))
