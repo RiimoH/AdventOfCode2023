@@ -51,19 +51,17 @@ dirs = {
 def parse(inp):
     inp = inp.splitlines()
     board = {(r, c): char for r, row in enumerate(inp) for c, char in enumerate(row)}
-    return board
+
+    width = len(inp[0])
+    height = len(inp)
+    return board, width, height
 
 
-def part_one(inp):
-    board = parse(inp)
-    visited = {
-        (0, 0): [
-            RIGHT,
-        ]
-    }
+def part_one(board, v1=0, v2=-1, d1=RIGHT):
+    visited = {}
 
     beams = [
-        ((0, 0), RIGHT),
+        ((v1, v2), d1),
     ]
 
     while beams:
@@ -85,34 +83,46 @@ def part_one(inp):
             ]
 
         new_dir = dirs[nt][dir]
-        ic((dir, new_dir, new_pos, nt))
         if type(new_dir[0]) is tuple:
             for d in new_dir:
                 beams.append((new_pos, d))
         else:
             beams.append((new_pos, new_dir))
 
-    lines = [list(line) for line in inp.splitlines()]
-    for pc, pr in visited.keys():
-        lines[pc][pr] = "#"
-    for line in lines:
-        print("".join(line))
+    # lines = [list(line) for line in inp.splitlines()]
+    # for pc, pr in visited.keys():
+    #     lines[pc][pr] = "#"
+    # for line in lines:
+    #     print("".join(line))
 
     return len(visited)
 
 
-def part_two(inp):
-    ...
+def part_two(board, width, height):
+    most_energy = 0
+
+    for c in range(width):
+        most_energy = max(most_energy, part_one(board, -1, c, DOWN))
+        most_energy = max(most_energy, part_one(board, height, c, UP))
+
+    for r in range(height):
+        most_energy = max(most_energy, part_one(board, r, -1, RIGHT))
+        most_energy = max(most_energy, part_one(board, r, height, LEFT))
+
+    return most_energy
 
 
 with open("16.inp") as fp:
     inp = fp.read()
+
+test, wt, ht = parse(test)
+inp, w, h = parse(inp)
 
 print("Test One:", part_one(test))
 
 ic.disable()
 print("Part One:", part_one(inp))
 
-# print("Test Two:", part_two(test))
+print("Test Two:", part_two(test, wt, ht))
 
-# print("Part Two:", part_two(inp))
+print("Part Two:", part_two(inp, w, h))
