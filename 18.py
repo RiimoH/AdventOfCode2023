@@ -81,16 +81,47 @@ def part_one(inp):
 
 
 def part_two(inp):
-    ...
+    def parse(inp):
+        instr = []
+        for line in inp.splitlines():
+            d, s, rgb = line.split()
+            rgb = rgb.rstrip(")").lstrip("(")
+            rgb, d = int(rgb[1:-1], 16), rgb[-1]
+            d = DIR[("R", "D", "L", "U")[int(d)]]
+            instr.append((d, rgb))
+        return instr
+
+    instr = ic(parse(inp))
+
+    points = [
+        (0, 0),
+    ]
+    c, r = 0, 0
+    total_steps = 0
+    for (dc, dr), steps in instr:
+        c += dc * steps
+        r += dr * steps
+        total_steps += steps
+        points.append((c, r))
+
+    s = 0
+    for i, (c1, r1) in enumerate(points):
+        (c2, r2) = points[i - 1]
+        s += c1 * r2 - r1 * c2
+
+    A = s / 2
+    R = total_steps
+    return int(A + 1 - (R / 2) + R)
 
 
 with open("18.inp") as fp:
     inp = fp.read()
 
-print("Test One:", part_one(test))
+# print("Test One:", part_one(test))
 
-print("Part One:", part_one(inp))
+# print("Part One:", part_one(inp))
 
-# print("Test Two:", part_two(test))
+print("Test Two:", part_two(test))
 
-# print("Part Two:", part_two(inp))
+ic.disable()
+print("Part Two:", part_two(inp))
