@@ -142,13 +142,6 @@ def part_one(inp):
 
 
 def part_two(inp):
-    def get_inside_cell(cell):
-        for vc, vr in vectors:
-            ncell = (cell[0] + vc, cell[1] + vr)
-            if ncell not in visited and board.get(ncell, 1) == 0:
-                visited.add(ncell)
-                get_inside_cell(ncell)
-
     _, chains, last_position, board = part_one(inp)
 
     # determine the whole loop
@@ -156,48 +149,14 @@ def part_two(inp):
 
     whole_chain = chains[0] + list(reversed(chains[1][1:-1]))
 
-    # determine which turn is more comon, left or right
-    vector = get_vector(whole_chain[-1], whole_chain[0])
-    part = whole_chain[-1]
+    s = 0
+    for i, (c1, r1) in enumerate(whole_chain):
+        (c2, r2) = whole_chain[i - 1]
+        s += c1 * r2 - r1 * c2
 
-    left_right = 0
-    left = set()
-    right = set()
-
-    for new_part in whole_chain:
-        new_vector = get_vector(part, new_part)
-        turn = get_turn(vector, new_vector)
-
-        if turn == 0:
-            l = (new_part[0] - new_vector[1], new_part[1] + new_vector[0])
-            if l not in whole_chain:
-                left.add(l)
-            r = (new_part[0] + new_vector[1], new_part[1] - new_vector[0])
-            if r not in whole_chain:
-                right.add(r)
-        else:
-            left_right += turn
-            vector = new_vector
-            part = new_part
-
-    # determine which fields are to the above determined _inside_
-    starting_points = set()
-    if left_right > 0:
-        inside = right
-    else:
-        inside = left
-
-    for cell in inside:
-        if board.get(cell, 1) == 0:
-            starting_points.add(cell)
-
-    visited = set()
-    for sp in starting_points:
-        get_inside_cell(sp)
-
-    # do a expansion-search from those fields
-
-    return len(visited)
+    A = s / 2
+    R = len(whole_chain)
+    return int(A + 1 - (R / 2))
 
 
 with open("10.inp") as fp:
@@ -209,7 +168,7 @@ with open("10.inp") as fp:
 # print("Part One:", part_one(inp)[0])
 
 print("Test Two.1 4", part_two(test3))
-# print("Test Two.2 8:", part_two(test4))
-# print("Test Two.3 10 :", part_two(test5))
+print("Test Two.2 8:", part_two(test4))
+print("Test Two.3 10 :", part_two(test5))
 
 # print("Part Two:", part_two(inp))
