@@ -40,28 +40,21 @@ def parse(inp):
 def part_one(inp):
     def generate_sections(section):
         pc, pr = section[-1]
+
         for dc, dr in dirs.values():
             npos = pc + dc, pr + dr
 
-            if npos in crossings:
-                sections.append(section)
+            if npos in section:
                 continue
 
-            t = board.get(npos, "#")
-            if t == "." or (t in dirs.keys() and (dr, dc) == dirs[t]):
-                tiles_around.append((npos, t))
+            if npos in crossings:
+                sections.append((section + [npos], len(section)))
+                continue
 
-        if len(tiles_around) <= 2:
-            for npos, t in tiles_around:
-                if npos not in section:
-                    section.append(npos)
-            generate_sections(section)
+            nt = board.get(npos, "#")
 
-        else:
-            sections.append(
-                (len(section), section[0], section[-1]),
-            )
-            generate_sections(section[-1])
+            if nt == "." or (nt in dirs.keys() and (dr, dc) == dirs[nt]):
+                generate_sections(section + [npos])
 
     def generate_crossings(crossings):
         for (r, c), tile in board.items():
@@ -69,7 +62,6 @@ def part_one(inp):
                 neighbors = []
                 for dr, dc in dirs.values():
                     if (nt := board.get((r + dr, c + dc), "#")) != "#":
-                        # if nt == "." or (nt in dirs.keys() and (dr, dc) == dirs[nt]):
                         neighbors.append(nt)
 
                 if len(neighbors) > 2:
@@ -90,12 +82,16 @@ def part_one(inp):
     crossings = generate_crossings(
         {
             start,
+            goal,
         }
     )
+    ic(crossings)
     for s in crossings:
         generate_sections(
             [s],
         )
+
+    ic(sections)
 
 
 def part_two(inp):
