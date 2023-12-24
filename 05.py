@@ -82,9 +82,7 @@ Subaction = namedtuple(
     ["target_lower", "target_upper", "origin_lower", "origin_upper", "calculation"],
 )
 
-Map = namedtuple(
-    "Map", ["lower_bounds", "upper_bounds", "origin"]
-)
+Map = namedtuple("Map", ["lower_bounds", "upper_bounds", "origin"])
 
 
 def make_actions(inp):
@@ -112,35 +110,35 @@ def make_actions(inp):
 
 def part_two(inp):
     inp = inp.split("\n\n")
-    seed, inp = inp[0], inp[1:]
-    inp = list(map(lambda x: x.split("\n"), inp))
+    # seed, inp = inp[0], inp[1:]
+    # inp = list(map(lambda x: x.split("\n"), inp))
 
-    actions = make_actions(inp)
+    # actions = make_actions(inp)
 
-    raw_seeds = list(map(int, seed.split()[1:]))
-    seeds = []
-    while raw_seeds:
-        start = raw_seeds.pop(0)
-        srange = raw_seeds.pop(1)
+    # raw_seeds = list(map(int, seed.split()[1:]))
+    # seeds = []
+    # while raw_seeds:
+    #     start = raw_seeds.pop(0)
+    #     srange = raw_seeds.pop(1)
 
-        seeds.append(Map(start, start+srange-1, start))
+    #     seeds.append(Map(start, start+srange-1, start))
 
-    ic(actions)
-    ic(seeds)
-    return
+    # ic(actions)
+    # ic(seeds)
+    # return
 
-    while seeds:
-        sstart, srange, seeds = seeds[0], seeds[1], seeds[2:]
-        for seed in range(sstart, sstart + srange):
-            for action in actions:
-                for action_range in action:
-                    if 0 <= seed - action_range[1] < action_range[2]:
-                        seed = seed + action_range[0] - action_range[1]
-                        break
+    # while seeds:
+    #     sstart, srange, seeds = seeds[0], seeds[1], seeds[2:]
+    #     for seed in range(sstart, sstart + srange):
+    #         for action in actions:
+    #             for action_range in action:
+    #                 if 0 <= seed - action_range[1] < action_range[2]:
+    #                     seed = seed + action_range[0] - action_range[1]
+    #                     break
 
-            min_location = min(min_location, seed)
+    #         min_location = min(min_location, seed)
 
-    return min_location
+    # return min_location
 
 
 with open("05.inp") as fp:

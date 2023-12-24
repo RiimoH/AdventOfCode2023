@@ -1,3 +1,4 @@
+from collections import namedtuple
 from icecream import ic
 
 
@@ -7,47 +8,56 @@ test = """19, 13, 30 @ -2,  1, -2
 12, 31, 28 @ -1, -2, -1
 20, 19, 15 @  1, -5, -3"""
 
+Point = namedtuple("Point", ["x", "y", "z"])
+
 
 def parse(inp):
     drops = []
     for line in inp.splitlines():
         pos, vec = line.split(" @ ")
-        pos = [int(x) for x in pos.split(", ")]
-        vec = [int(x) for x in vec.split(", ")]
-        drops.append(
-            (
-                tuple(pos),
-                tuple(vec),
-            )
-        )
+        pos = Point(*[int(x) for x in pos.split(", ")])
+        vec = Point(*[int(x) for x in vec.split(", ")])
+        drops.append((pos, vec))
 
     return drops
 
 
-def part_one(inp, x_left=7, x_right=27):
+def is_intersecting(p1, p2, n1, n2):
+    try:
+        a = n1.y / n1.x
+        b = n2.y / n2.x
+
+        c = (-p1.x / n1.x) * n1.y + p1.y
+        d = (-p2.x / n2.x) * n2.y + p2.y
+
+        x = (d - c) / (a - b)
+        y = a * x + c
+
+        return x, y
+    except:
+        return False, False
+
+
+def check_time(x_intersect, p1, p2, n1, n2):
+    x1 = (x_intersect - p1.x) / n1.x
+    x2 = (x_intersect - p2.x) / n2.x
+    return x1 >= 0 and x2 >= 0
+
+
+def part_one(inp, lim_low=7, lim_high=27):
     drops = parse(inp)
     ic(drops)
 
     intersecting = 0
 
-    for i, ((px, py, pz), (vx, vy, vz)) in enumerate(drops[:-1]):
-        for (ox, oy, oz), (qx, qy, qz) in drops[i + 1 :]:
-            m1 = vy / vx
-            m2 = qy / qx
-
-            b1 = (x_left - px) * m1 + py
-            b2 = (x_left - ox) * m2 + oy
-
-            
-
-            # pyl = (x_left - px) / vx * vy + py
-            # oyl = -ox / qx * qy + oy
-
-            # pyr = (x_right - px) / vx * vy + py
-            # oyr = (x_right - ox) / qx * qy + oy
-
-            # if (pyl > oyl and pyr < oyr) or (pyl < oyl and pyr > oyr):
-            #     intersecting += 1
+    for i, (p1, n1) in enumerate(drops[:-1]):
+        for p2, n2 in drops[i + 1 :]:
+            ic(p1, n1, p2, n2)
+            x, y = ic(is_intersecting(p1, p2, n1, n2))
+            if x and y:
+                if lim_low <= x <= lim_high and lim_low <= y <= lim_high:
+                    if ic(check_time(x, p1, p2, n1, n2)):
+                        intersecting += 1
 
     return intersecting
 
@@ -56,12 +66,12 @@ def part_two(inp):
     ...
 
 
-# with open("") as fp:
-#     inp = fp.read()
+with open("24.inp") as fp:
+    inp = fp.read()
 
 print("Test One:", part_one(test))
-
-# print("Part One:", part_one(inp))
+ic.disable()
+print("Part One:", part_one(inp, lim_low=200000000000000, lim_high=400000000000000))
 
 # print("Test Two:", part_two(test))
 
