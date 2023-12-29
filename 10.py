@@ -156,7 +156,7 @@ def part_two(inp):
 
     A = s / 2
     R = len(whole_chain)
-    return int(A + 1 - (R / 2))
+    return int(abs(A) + 1 - (R / 2))
 
 
 with open("10.inp") as fp:
@@ -171,4 +171,4 @@ print("Test Two.1 4", part_two(test3))
 print("Test Two.2 8:", part_two(test4))
 print("Test Two.3 10 :", part_two(test5))
 
-# print("Part Two:", part_two(inp))
+print("Part Two:", part_two(inp))
