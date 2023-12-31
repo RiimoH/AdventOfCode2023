@@ -117,6 +117,11 @@ def part_two(inp):
         for som in x2ymap:
             untouched_seeds = []
             for csr in all_seed_ranges:
+                """
+                csr : current_seed_range
+                som : section_of_map
+                """
+
                 if csr[-1] < som[0][0] or csr[0] > som[0][-1]:
                     # csr is outside som
                     untouched_seeds.append(csr)
