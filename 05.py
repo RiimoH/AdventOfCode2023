@@ -88,8 +88,8 @@ def make_actions(inp):
             drs, srs, rl = list(map(int, sa.split()))
             sactions.append(
                 (
-                    range(srs, srs + rl),
-                    range(drs, drs + rl),
+                    range(srs, srs + rl + 1),
+                    range(drs, drs + rl + 1),
                 )
             )
 
@@ -100,50 +100,65 @@ def make_actions(inp):
 
 def part_two(inp):
     inp = inp.split("\n\n")
-    seed, actions = inp[0], inp[1:]
+    seed, x2ymaps = inp[0], inp[1:]
 
     seed = seed.split()[1:]
-    seeds = []
+    all_seed_ranges = []
     while seed:
         st = int(seed.pop(0))
         ra = int(seed.pop(0))
 
-        seeds.append(range(st, st + ra))
+        all_seed_ranges.append(range(st, st + ra))
 
-    actions = make_actions(actions)
+    x2ymaps = make_actions(x2ymaps)
 
-    for action in actions:
+    for x2ymap in x2ymaps:
         new_seeds = []
-        for tmap in action:
-            remaining_seeds = []
-            for seedr in seeds:
-                if tmap[-1] < seedr[0] or tmap[0] > seedr[-1]:
-                    remaining_seeds.append(seedr)
+        for som in x2ymap:
+            untouched_seeds = []
+            for csr in all_seed_ranges:
+                if csr[-1] < som[0][0] or csr[0] > som[0][-1]:
+                    # csr is outside som
+                    untouched_seeds.append(csr)
 
-                elif tmap[-1] < seedr[-1] and tmap[0] < seedr[0]:
-                    # starts below and ends inside
-                    stmap = seedr.index(tmap[0])
-                    new_seeds.append(seedr[: stmap + 1])
-                    remaining_seeds.append(seedr[stmap + 1 :])
+                elif csr[0] >= som[0][0] and csr[-1] > som[0][-1]:
+                    # csr starts in/with som and extends beyond
+                    smap = som[0].index(csr[0])
+                    emap = csr.index(som[0][-1])
 
-                elif tmap[-1] > seedr[-1] and tmap[0] > seedr[0]:
-                    # Starts inside and extends beyond
-                    stmap = seedr.index(tmap[0])
-                    remaining_seeds.append(seedr[:stmap])
-                    new_seeds.append(seedr[stmap:])
+                    new_seeds.append(som[1][smap:])
+                    untouched_seeds.append(csr[emap + 1 :])
 
-                elif tmap[-1] < seedr[-1] and tmap[0] > seedr[0]:
-                    # Is completly inside
-                    stmap = seedr.index(tmap[0])
-                    etmap = seedr.index(tmap[-1])
-                    remaining_seeds.append(seedr[:stmap])
-                    remaining_seeds.append(seedr[etmap + 1 :])
-                    new_seeds.append(seedr[stmap : etmap + 1])
+                elif csr[0] < som[0][0] and csr[-1] <= som[0][-1]:
+                    # csr starts before som and extends to/into it
+                    smap = csr.index(som[0][0])
+                    emap = som[0].index(csr[-1])
 
-            seeds = remaining_seeds
-        seeds.extend(new_seeds)
+                    untouched_seeds.append(csr[:smap])
+                    new_seeds.append(som[1][: emap + 1])
 
-    return seeds
+                elif csr[0] >= som[0][0] and csr[-1] <= som[0][-1]:
+                    # csr is complettely contained
+                    stmap = som[0].index(csr[0])
+                    etmap = som[0].index(csr[-1])
+                    new_seeds.append(som[1][stmap : etmap + 1])
+
+                elif csr[0] < som[0][0] and csr[-1] > som[0][-1]:
+                    # csr completely contains som
+                    stmap = csr.index(som[0][0])
+                    etmap = csr.index(som[0][-1])
+
+                    new_seeds.append(som[1])
+                    untouched_seeds.append(csr[:stmap])
+                    untouched_seeds.append(csr[etmap + 1 :])
+
+                else:
+                    ic(csr, som, "Mistake")
+
+            all_seed_ranges = untouched_seeds
+        all_seed_ranges.extend(new_seeds)
+
+    return sorted(all_seed_ranges, key=lambda x: x[0])[0][0]
 
     # range(max(x[0], y[0]), min(x[-1], y[-1]) + 1)
 
@@ -170,4 +185,4 @@ with open("05.inp") as fp:
 
 print("Test Two:", part_two(test))
 
-# print("Part Two:", part_two(inp))
+print("Part Two:", part_two(inp))
