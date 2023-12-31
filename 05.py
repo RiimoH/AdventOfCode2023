@@ -77,55 +77,75 @@ def part_one(inp):
     return min([v[7] for v in seeds.values()])
 
 
-Subaction = namedtuple(
-    "Subaction",
-    ["target_lower", "target_upper", "origin_lower", "origin_upper", "calculation"],
-)
-
-Map = namedtuple("Map", ["lower_bounds", "upper_bounds", "origin"])
-
-
 def make_actions(inp):
-    actions: List[Subaction] = []
+    actions = []
 
-    for action in inp:
-        action = action[1:]
-        subaction: List[Subaction] = list()
-        for srange in action:
-            srange = list(map(int, srange.split()))
-            sa = Subaction(
-                srange[0],
-                srange[0] + srange[2] - 1,
-                srange[1],
-                srange[1] + srange[2] - 1,
-                srange[0] - srange[1],
+    for tmap in inp:
+        tmap = tmap.splitlines()
+        tmap = tmap[1:]
+        sactions = []
+        for sa in tmap:
+            drs, srs, rl = list(map(int, sa.split()))
+            sactions.append(
+                (
+                    range(srs, srs + rl),
+                    range(drs, drs + rl),
+                )
             )
-            subaction.append(sa)
-        subaction.sort()
 
-        actions.append(subaction)
+        actions.append(sactions)
 
     return actions
 
 
 def part_two(inp):
     inp = inp.split("\n\n")
-    # seed, inp = inp[0], inp[1:]
-    # inp = list(map(lambda x: x.split("\n"), inp))
+    seed, actions = inp[0], inp[1:]
 
-    # actions = make_actions(inp)
+    seed = seed.split()[1:]
+    seeds = []
+    while seed:
+        st = int(seed.pop(0))
+        ra = int(seed.pop(0))
 
-    # raw_seeds = list(map(int, seed.split()[1:]))
-    # seeds = []
-    # while raw_seeds:
-    #     start = raw_seeds.pop(0)
-    #     srange = raw_seeds.pop(1)
+        seeds.append(range(st, st + ra))
 
-    #     seeds.append(Map(start, start+srange-1, start))
+    actions = make_actions(actions)
 
-    # ic(actions)
-    # ic(seeds)
-    # return
+    for action in actions:
+        new_seeds = []
+        for tmap in action:
+            remaining_seeds = []
+            for seedr in seeds:
+                if tmap[-1] < seedr[0] or tmap[0] > seedr[-1]:
+                    remaining_seeds.append(seedr)
+
+                elif tmap[-1] < seedr[-1] and tmap[0] < seedr[0]:
+                    # starts below and ends inside
+                    stmap = seedr.index(tmap[0])
+                    new_seeds.append(seedr[: stmap + 1])
+                    remaining_seeds.append(seedr[stmap + 1 :])
+
+                elif tmap[-1] > seedr[-1] and tmap[0] > seedr[0]:
+                    # Starts inside and extends beyond
+                    stmap = seedr.index(tmap[0])
+                    remaining_seeds.append(seedr[:stmap])
+                    new_seeds.append(seedr[stmap:])
+
+                elif tmap[-1] < seedr[-1] and tmap[0] > seedr[0]:
+                    # Is completly inside
+                    stmap = seedr.index(tmap[0])
+                    etmap = seedr.index(tmap[-1])
+                    remaining_seeds.append(seedr[:stmap])
+                    remaining_seeds.append(seedr[etmap + 1 :])
+                    new_seeds.append(seedr[stmap : etmap + 1])
+
+            seeds = remaining_seeds
+        seeds.extend(new_seeds)
+
+    return seeds
+
+    # range(max(x[0], y[0]), min(x[-1], y[-1]) + 1)
 
     # while seeds:
     #     sstart, srange, seeds = seeds[0], seeds[1], seeds[2:]
