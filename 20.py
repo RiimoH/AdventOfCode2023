@@ -1,5 +1,6 @@
 from icecream import ic
 from collections import defaultdict
+from math import gcd
 
 
 test = """broadcaster -> a, b, c
@@ -107,47 +108,51 @@ def part_one(inp, pushes=1):
 
 def part_two(inp):
     modules = parse(inp)
-    low_pulses = 0
-    high_pulses = 0
 
-    push = 0
+    targets = {
+        "ls": 0,
+        "nb": 0,
+        "vc": 0,
+        "vg": 0,
+    }
 
-    while True:
-        push += 1
-        low_pulses += 1
-        pulses: list = modules["broadcaster"].pulse()
+    ins = [("sj", "vc"), ("nk", "vg"), ("sr", "nb"), ("tp", "ls")]
 
-        calc = [int(x) for (_, (_, x)) in pulses]
-        high_pulses += sum(calc)
-        low_pulses += len(calc) - sum(calc)
+    for i, t in ins:
+        p = 0
+        while targets[t] == 0:
+            p += 1
+            pulses: list = [
+                (i, ("broadcaster", 0)),
+            ]
 
-        while pulses:
-            (receiver, (sender, pulse)) = pulses.pop(0)
-            if receiver == "rx" and pulse == 0:
-                return push
-            ic(f"{sender} -{'high' if pulse else 'low'}-> {receiver}")
-            new_pulses = modules[receiver].pulse(sender, pulse)
+            while pulses:
+                (receiver, (sender, pulse)) = pulses.pop(0)
 
-            if new_pulses:
-                calc = [int(x) for (_, (_, x)) in new_pulses]
+                ic(f"{sender} -{'high' if pulse else 'low'}-> {receiver}")
+                if receiver in targets and pulse == 0:
+                    targets[receiver] = p
+                    ic(f"{receiver} received a pulse of {p}")
+                    break
 
-                high_pulses += sum(calc)
-                low_pulses += len(calc) - sum(calc)
+                new_pulses = modules[receiver].pulse(sender, pulse)
 
-                pulses.extend(new_pulses)
+                if new_pulses:
+                    pulses.extend(new_pulses)
 
-    return low_pulses * high_pulses, low_pulses, high_pulses
+    lcm = 1
+    for i in targets.values():
+        lcm = lcm * i // gcd(lcm, i)
+    return lcm
 
 
 with open("20.inp") as fp:
     inp = fp.read()
 
 ic.disable()
-print("Test One:", part_one(test, 1_000))
-print("Test One:", part_one(test2, 1_000))
+# print("Test One:", part_one(test, 1_000))
+# print("Test One:", part_one(test2, 1_000))
 
-print("Part One:", part_one(inp, 1_000))
-
-# print("Test Two:", part_two(test))
+# print("Part One:", part_one(inp, 1_000))
 
 print("Part Two:", part_two(inp))
