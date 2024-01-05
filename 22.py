@@ -42,7 +42,11 @@ def parse(inp):
 
 def part_one(inp):
     blocks = parse(inp)
-    ic(blocks)
+
+    # drop them all. Lower ones first
+    # check wether they interfere with a lower one while doing so.
+
+    
 
 
 def part_two(inp):
