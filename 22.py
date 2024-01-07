@@ -113,22 +113,31 @@ def part_two(inp):
         for p in block.points:
             settled_blocks[p] = block
 
-    max_falling = 0
+    s = 0
     for block in blocks:
         queue = [*block.supports]
-
+        popped = {
+            block,
+        }
         while queue:
             b = queue.pop()
-            ...
+
+            if not b.supported_by.difference(popped):
+                popped.add(b)
+                queue.extend(b.supports)
+
+        s += len(popped) - 1
+
+    return s
 
 
 with open("22.inp") as fp:
     inp = fp.read()
 
-print("Test One:", part_one(test))
+# print("Test One:", part_one(test))
 
-print("Part One:", part_one(inp))
+# print("Part One:", part_one(inp))
 
-# print("Test Two:", part_two(test))
+print("Test Two:", part_two(test))
 
-# print("Part Two:", part_two(inp))
+print("Part Two:", part_two(inp), "> 1364")
