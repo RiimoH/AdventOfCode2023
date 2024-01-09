@@ -1,5 +1,6 @@
 from collections import namedtuple
 from icecream import ic
+from sympy import solve, Eq, symbols
 
 
 test = """19, 13, 30 @ -2,  1, -2
@@ -46,8 +47,6 @@ def check_time(x_intersect, p1, p2, n1, n2):
 
 def part_one(inp, lim_low=7, lim_high=27):
     drops = parse(inp)
-    ic(drops)
-
     intersecting = 0
 
     for i, (p1, n1) in enumerate(drops[:-1]):
@@ -63,16 +62,32 @@ def part_one(inp, lim_low=7, lim_high=27):
 
 
 def part_two(inp):
-    ...
+    drops = parse(inp)
+
+    equations = []
+    for drop in drops[:10]:
+        xr, yr, zr, vxr, vyr, vzr = symbols("rx ry rz vrx vry vrz")
+        (x, y, z), (vx, vy, vz) = drop
+        equations.extend(
+            [
+                Eq((xr - x) * (vy - vyr), (yr - y) * (vx - vxr)),
+                Eq((yr - y) * (vz - vzr), (zr - z) * (vy - vyr)),
+            ]
+        )
+
+    solutions = solve(equations, dict=True)
+    if len(solutions) == 1:
+        sol = solutions[0]
+        return sum([sol[xr], sol[yr], sol[zr]])
 
 
 with open("24.inp") as fp:
     inp = fp.read()
 
-print("Test One:", part_one(test))
-ic.disable()
-print("Part One:", part_one(inp, lim_low=200000000000000, lim_high=400000000000000))
+# print("Test One:", part_one(test))
+# ic.disable()
+# print("Part One:", part_one(inp, lim_low=200000000000000, lim_high=400000000000000))
 
-# print("Test Two:", part_two(test))
+print("Test Two:", part_two(test))
 
-# print("Part Two:", part_two(inp))
+print("Part Two:", part_two(inp))
